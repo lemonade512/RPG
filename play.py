@@ -1,0 +1,3 @@
+from statemanager import *
+
+StartManager()
