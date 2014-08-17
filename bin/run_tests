@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+dest="$(readlink -m $(dirname $0)/../tests)"
+echo "Running tests in $dest"
+nosetests $@ -w $dest
