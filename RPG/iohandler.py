@@ -8,21 +8,20 @@ Date: 8/16/14
 
 import sys
 import os
-import tty, fcntl, termios
 import time
 import curses
 
 class IOHandler:
 
-    def __init__(self, event_dispatcher, current_menu):
+    def __init__(self, event_dispatcher):
         self.in_buf = ''
+        self.output_log_name = 'output_log.txt'
 
         self.input_pos = None
         self.after_menu_pos = None
 
         self.dispatcher = event_dispatcher
-        self.current_menu = current_menu
-        # self.output_log = open('my_cool_file', 'rw')
+        self.current_menu = None
 
     def __enter__(self):
         self.stdscr = curses.initscr()
@@ -36,12 +35,16 @@ class IOHandler:
         self.stdscr.keypad(0)
         curses.echo()
         curses.endwin()
+        if os.path.isfile(self.output_log_name):
+            os.remove(self.output_log_name)
 
     @property
     def screen_size(self):
         return self.stdscr.getmaxyx()
 
     def show_menu(self, menu):
+        # TODO handle error that happens when window gets too small
+        # TODO will need to create columns for options
         self.current_menu = menu
         self.clear_screen()
         self.stdscr.addstr("What would you like to do?\n")
@@ -53,13 +56,17 @@ class IOHandler:
         # print output from output_log
 
     def refresh(self):
-        #TODO refresh the main log so that strings that
-        # were two lines can be joined to one line (use
-        # main output log file)
         self.clear_screen()
         self.show_menu(self.current_menu)
         self.input_pos = None
         self.write_to_input('>>> ' + self.in_buf)
+
+        top_left = self.after_menu_pos
+        max_pos = self.stdscr.getmaxyx()
+        bottom_right = (max_pos[0]-2, max_pos[1]-1)
+        lines = bottom_right[0] - top_left[0]
+        prev_output = self.tail_output(lines)
+        self.write_to_log(prev_output, write_to_file=False)
 
     def on_backspace(self):
         # make sure not to delete prompt
@@ -88,28 +95,64 @@ class IOHandler:
         self.input_pos = self.stdscr.getyx()
         return True
 
+    def tail_output(self, window=20):
+        '''
+        Gotten from stack overflow
+        '''
+        with open(self.output_log_name, 'r') as f:
+            BUFSIZ = 1024
+            f.seek(0, 2)
+            bytes = f.tell()
+            size = window
+            block = -1
+            data = []
+            while size > 0 and bytes > 0:
+                if (bytes - BUFSIZ > 0):
+                    # Seek back one whole BUFSIZ
+                    f.seek(block*BUFSIZ, 2)
+                    # read BUFFER
+                    data.append(f.read(BUFSIZ))
+                else:
+                    # file too small, start from begining
+                    f.seek(0,0)
+                    # only read what was not read
+                    data.append(f.read(bytes))
+                linesFound = data[-1].count('\n')
+                size -= linesFound
+                bytes -= BUFSIZ
+                block -= 1
+            return '\n'.join(''.join(data).splitlines()[-window:])
+
     def num_lines(self, string):
         term_size = self.stdscr.getmaxyx()
         num_lines = (len(string) / term_size[1]) + 1
         num_lines += string.count('\n')
         return num_lines
 
-    def write_to_log(self, string=''):
+    def write_to_log(self, string='', write_to_file=True):
         '''
         writes string to the main log section of the window
         '''
         top_left = self.after_menu_pos
         max_pos = self.stdscr.getmaxyx()
-        bottom_right = (max_pos[0]-2, max_pos[1])
+        bottom_right = (max_pos[0]-2, max_pos[1]-1)
+        if bottom_right[0] < top_left[0]:
+            return
 
         self.stdscr.setscrreg(top_left[0], bottom_right[0])
-        io_handler.stdscr.scrollok(1)
+        self.stdscr.scrollok(1)
         lines = self.num_lines(string)
         self.stdscr.scroll(lines)
-        io_handler.stdscr.scrollok(0)
+        self.stdscr.scrollok(0)
 
         self.stdscr.move(bottom_right[0]-lines+1, 0)
         self.stdscr.addstr(string)
+
+        if write_to_file:
+            output_log = open(self.output_log_name, 'a')
+            output_log.write(string+'\n')
+            output_log.flush()
+            output_log.close()
 
     def raw_input(self):
         '''
@@ -154,7 +197,7 @@ class IOHandler:
             for opt in self.current_menu.options:
                 if opt == user_in:
                     self.write_to_log("Matched: " + str(opt) + '\n')
-                    #self.dispatcher.dispatch(opt.event)
+                    self.dispatcher.dispatch(opt.event)
                     return
 
             self.write_to_log("INVALID INPUT\n")
@@ -170,7 +213,10 @@ if __name__ == "__main__":
     mt = MatchTemplate('partial_string', 'opt2')
     m.add_option(MenuOption('opt2', [mt], None))
 
-    io_handler = IOHandler(None, m)
+    from event_dispatcher import EventDispatcher
+    dispatcher = EventDispatcher()
+    io_handler = IOHandler(dispatcher)
+
     with io_handler:
         io_handler.show_menu(m)
         while True:

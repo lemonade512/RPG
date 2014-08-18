@@ -11,7 +11,6 @@ import signal
 
 # This line should be changed to above when you work out pathing issues
 from event_dispatcher import EventDispatcher, EventTypeEnum
-from utils import getTerminalSize, UserInput
 from collections import namedtuple
 
 MatchTemplate = namedtuple('MatchTemplate', 'match_type match_string')
@@ -70,30 +69,3 @@ class Menu:
 
     def add_option(self, menu_option):
         self.options.append(menu_option)
-
-# SHOULD BE HANDLED BY INPUT_MANAGER
-#    def get_input(self):
-#        while True:
-#            user_in = self.user_input.get_input()
-#            self.user_input.clear_input()
-#            #user_in = raw_input()
-#            print "User input: " + str(user_in)
-#            # check what menu option matches user input
-#            for opt in self.options:
-#                if opt == user_in:
-#                    print "Matched: " + str(opt)
-#                    self.dispatcher.dispatch(opt.event)
-#                    return
-#
-#            print "INVALID INPUT"
-#            print ">>> ",
-
-
-if __name__ == "__main__":
-    menu = Menu([])
-    mt = MatchTemplate('regex', r'hell')
-    menu.add_option(MenuOption('option 1', [mt], None))
-    mt = MatchTemplate('full_string', '2')
-    menu.add_option(MenuOption('option 2', [mt], None))
-    menu.show()
-    menu.get_input()

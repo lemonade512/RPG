@@ -35,6 +35,9 @@ class EventDispatcher:
         self.event_handlers = dict()
 
     def dispatch(self, event):
+        if event == None:
+            return
+
         if event.event_type not in self.event_handlers:
             return
 
