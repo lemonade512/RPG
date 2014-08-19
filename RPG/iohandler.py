@@ -47,9 +47,7 @@ class IOHandler:
         # TODO will need to create columns for options
         self.current_menu = menu
         self.clear_screen()
-        self.stdscr.addstr("What would you like to do?\n")
-        for option in menu.options:
-            self.stdscr.addstr(repr(option.msg)+'\n')
+        self.stdscr.addstr(self.current_menu.as_string(self.screen_size))
         self.stdscr.addstr('-'*self.screen_size[1])
         self.stdscr.refresh()
         self.after_menu_pos = self.stdscr.getyx()

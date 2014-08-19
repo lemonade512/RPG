@@ -69,3 +69,10 @@ class Menu:
 
     def add_option(self, menu_option):
         self.options.append(menu_option)
+
+    def as_string(self, size):
+        string = "Size: " + str(size) +"\n"
+        string += "What would you like to do?\n"
+        for option in self.options:
+            string += repr(option.msg) + '\n'
+        return string
