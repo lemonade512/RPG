@@ -10,7 +10,8 @@ class Game:
         self.event_dispatcher = EventDispatcher()
         self.io_handler = IOHandler(self.event_dispatcher)
         self.time_keeper = TimeKeeper(self.event_dispatcher)
-        self.battle_engine = BattleEngine(self.event_dispatcher)
+        self.time_keeper.current_time = Time(1000, 1, 1, 8, 0, 0)
+        #self.battle_engine = BattleEngine(self.event_dispatcher)
 
         self.current_menu = ActionMenu()
 
