@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 dest="$(readlink -m $(dirname $0)/../tests)"
 echo "Running tests in $dest"
+# To run with test coverage use the option --with-coverage
 nosetests $@ -w $dest

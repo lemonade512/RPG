@@ -1,2 +1,8 @@
 # TODO Write an interactive test suite for IOHandler. These tests will require actual user input but should provide
 # directons to the user as to what they should type.
+# TODO Make a main menu
+# TODO Figure out how to have multi-page menus
+# TODO Create a basic action menu
+# TODO Create a location class (should areas hold locations or should locations be aware of areas?)
+#
+# NOTE When areas are implemented make sure that areas can be inside other areas (like a woodland area can be inside a kingdom)
