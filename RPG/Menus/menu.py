@@ -2,16 +2,16 @@
 '''
 This class provides the basic functionality for menus.
 '''
+
+# Standard library imports
 import os
 import sys
 import time
 import re
-import signal
-#from RPG.event_dispatcher import EventDispatcher, EventTypeEnum
-
-# This line should be changed to above when you work out pathing issues
-from event_dispatcher import EventDispatcher, EventTypeEnum
 from collections import namedtuple
+
+# Project Imports
+from RPG.event_dispatcher import EventDispatcher, EventTypeEnum
 
 MatchTemplate = namedtuple('MatchTemplate', 'match_type match_string')
 #TODO should MatchTemplate be a class with a match method? It could then be subclassed into
@@ -24,6 +24,7 @@ class MenuOption:
         '''
         match_list is a list containing MatchTemplate's
                 This allows using many different
+        msg is the string representation of this option
         '''
         self.msg = msg
         self.match_list = match_list
@@ -58,7 +59,7 @@ class MenuOption:
 
         return False
 
-class Menu:
+class Menu(object):
     '''
     WARNING: When you are creating menus make sure that there isn't
     input that could match multiple options

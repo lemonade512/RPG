@@ -2,6 +2,11 @@
 '''
 This class keeps track of the player and the event queue.
 '''
+import signal
+from RPG.event_dispatcher import EventDispatcher
+from RPG.time_keeper import TimeKeeper, Time
+from RPG.iohandler import IOHandler
+from RPG.Menus.main_menu import MainMenu
 
 class Game:
 
@@ -13,11 +18,9 @@ class Game:
         self.time_keeper.current_time = Time(1000, 1, 1, 8, 0, 0)
         #self.battle_engine = BattleEngine(self.event_dispatcher)
 
-        self.current_menu = ActionMenu()
+        self.current_menu = MainMenu()
 
         self.playing = False
-
-        signal.signal(signal.SIGWINCH, self.window_changed)
 
     def main(self):
         with self.io_handler:
@@ -30,10 +33,12 @@ class Game:
 
         # Main game loop
         self.playing = True
-        while self.playing:
-            menu = self.current_menu
-            self.io_handler.show_menu(menu)
-            self.io_handler.get_input()
+        with self.io_handler:
+            while self.playing:
+                menu = self.current_menu
+                self.io_handler.show_menu(menu)
+                self.io_handler.get_input()
 
-    def window_changed(self, *args):
-        self.io_handler.refresh_screen()
+if __name__ == "__main__":
+    game = Game()
+    game.start()

@@ -10,6 +10,7 @@ class EventTypeEnum:
     GAME_QUIT='game quit'
 
     MENU_TEST='test menu events'
+    MENU_MAIN_PLAY='main menu play'
 
 class EventDispatcher:
 
