@@ -11,6 +11,7 @@ class EventTypeEnum:
 
     MENU_TEST='test menu events'
     MENU_MAIN_PLAY='main menu play'
+    MENU_ACTION_MOVE='action menu move'
 
 class EventDispatcher:
 

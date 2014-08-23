@@ -4,5 +4,8 @@
 # TODO Figure out how to have multi-page menus
 # TODO Create a basic action menu
 # TODO Create a location class (should areas hold locations or should locations be aware of areas?)
+# TODO For match options have each option contain a matched() function to implement more complex behaviour when an option is matched
+#      (like if you want to just press "move north" instead of "move" and then in the submenu press "north"
+# TODO Allow scrolling the log screen with the arrow keys
 #
-# NOTE When areas are implemented make sure that areas can be inside other areas (like a woodland area can be inside a kingdom)
+# NOTE When areas are implemented make sure that locations can be in multiple areas (like in a woods and a kingdom)

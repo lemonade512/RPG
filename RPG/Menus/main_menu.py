@@ -26,5 +26,5 @@ class MainMenu(Menu):
         string+= "|_| \_\_|    \____|\n"
         string+= "-------------------\n"
         for option in self.options:
-            string += repr(option.msg) + "\n"
+            string += option.msg + "\n"
         return string

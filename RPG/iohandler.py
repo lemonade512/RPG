@@ -6,9 +6,7 @@ Author: Phillip Lemons
 Date: 8/16/14
 '''
 
-import sys
 import os
-import time
 import curses
 import locale
 
@@ -40,14 +38,6 @@ class IOHandler:
         if os.path.isfile(self.output_log_name):
             os.remove(self.output_log_name)
 
-    @property
-    def num_log_lines(self):
-        top_left = self.after_menu_pos
-        max_pos = self.stdscr.getmaxyx()
-        bottom_right = (max_pos[0]-2, max_pos[1]-1)
-        lines = bottom_right[0] - top_left[0]
-        return lines
-
     def show_menu(self, menu):
         # TODO will need to create columns for options
         self.current_menu = menu
@@ -77,17 +67,23 @@ class IOHandler:
 
         self.stdscr.refresh()
         # print output from output_log
-        #prev_output = self.tail_output(self.num_log_lines)
-        #self.write_to_log(prev_output, write_to_file=False)
+        self.print_from_file()
+
+    def print_from_file(self):
+        y, x = self.log_win.getmaxyx()
+        prev_output = self.tail_output(y)
+        if prev_output == None:
+            return
+        lines = prev_output.split('\n')
+        for line in lines:
+            self.write_to_log(line, write_to_file=False)
 
     def refresh(self):
-        self.clear_screen()
+        self.stdscr.erase()
         self.show_menu(self.current_menu)
         self.input_pos = None
         self.write_to_input('>>> ' + self.in_buf)
-
-        prev_output = ''.join(self.tail_output(self.num_log_lines+10))
-        self.write_to_log(prev_output, write_to_file=False)
+        self.print_from_file()
 
     def on_backspace(self):
         # make sure not to delete prompt
@@ -170,18 +166,22 @@ class IOHandler:
         self.log_win.scroll(lines)
         self.log_win.scrollok(0)
 
-        # Fix bug where lines > num lines in window
+        # TODO Fix bug where lines > num lines in window
         self.log_win.move(max_y-lines-1, 0)
         self.log_win.addstr(string)
         #self.stdscr.addstr(top_left[0], top_left[1], u'\u2588'.encode('utf-8'))
 
         if write_to_file:
             output_log = open(self.output_log_name, 'a')
-            output_log.write('\n'+string)
+            output_log.write(string+'\n')
             output_log.flush()
             output_log.close()
 
         self.log_win.refresh()
+        if self.input_pos == None:
+            self.input_pos = (0,0)
+        self.input_win.move(*self.input_pos)
+        self.input_win.refresh()
 
     def raw_input(self):
         '''

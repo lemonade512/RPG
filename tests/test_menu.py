@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import StringIO
-from RPG.menu import Menu, MenuOption, MatchTemplate
+from RPG.Menus.menu import Menu, MenuOption, MatchTemplate
 from RPG.event_dispatcher import EventDispatcher, EventTypeEnum
 from RPG.event import Event
 from nose.tools import *
