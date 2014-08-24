@@ -39,35 +39,41 @@ class IOHandler:
             os.remove(self.output_log_name)
 
     def show_menu(self, menu):
-        # TODO will need to create columns for options
+        #TODO will need to clean this function to be more generic
         self.current_menu = menu
         self.stdscr.erase()
         max_y, max_x = self.stdscr.getmaxyx()
 
         # Setup Menu window
-        menu_string = self.current_menu.as_string((max_y, max_x))
-        menu_size = self.num_lines(menu_string)
-        self.menu_border_win = self.stdscr.derwin(menu_size+1, max_x, 0,0)
+        menu_string = self.current_menu.as_string((max_y, max_x-2))
+        menu_size = self.num_lines(menu_string, (max_y, max_x-2))
+        self.menu_border_win = self.stdscr.derwin(menu_size+2, max_x, 0,0)
         self.menu_win = self.menu_border_win.derwin(menu_size, max_x-2, 1,1)
-        self.menu_win.addstr(menu_string)
+        try:
+            self.menu_win.addstr(menu_string)
+        except:
+            # Error happens when line is a multiple of term size
+            # Haven't seen adverse effects yet
+            pass
         self.menu_border_win.border()
 
         # Setup Log window
         #NOTE assumes input window size of 3 lines
         # subtract extra 1 for log border
-        log_size = max_y - (menu_size+1) - 3 - 1
-        self.log_border_win = self.stdscr.derwin(log_size+1, max_x, menu_size+1, 0)
+        log_size = max_y - (menu_size+2) - 3 - 1
+        self.log_border_win = self.stdscr.derwin(log_size+1, max_x, menu_size+2, 0)
         self.log_win = self.log_border_win.derwin(log_size, max_x-2, 1, 1)
         self.log_border_win.border()
 
         # Setup Input window
-        self.input_border_win = self.stdscr.derwin(3, max_x, menu_size+log_size + 2, 0)
+        self.input_border_win = self.stdscr.derwin(3, max_x, menu_size+log_size + 3, 0)
         self.input_win = self.input_border_win.derwin(1, max_x-2, 1, 1)
         self.input_border_win.border()
 
-        self.stdscr.refresh()
         # print output from output_log
         self.print_from_file()
+
+        self.stdscr.refresh()
 
     def print_from_file(self):
         y, x = self.log_win.getmaxyx()
@@ -79,11 +85,10 @@ class IOHandler:
             self.write_to_log(line, write_to_file=False)
 
     def refresh(self):
-        self.stdscr.erase()
+        self.stdscr.clear()
         self.show_menu(self.current_menu)
         self.input_pos = None
         self.write_to_input('>>> ' + self.in_buf)
-        self.print_from_file()
 
     def on_backspace(self):
         # make sure not to delete prompt
@@ -144,14 +149,20 @@ class IOHandler:
                 block -= 1
             return '\n'.join(''.join(data).splitlines()[-window:])
 
-    def num_lines(self, string):
+    def num_lines(self, string, size):
+        #TODO fix bug where there is an extra space at the end of
+        # the menu if the options perfectly fill space (thinks
+        # there is one too many lines)
         if string == None:
             return 0
         lines = string.split('\n')
-        term_size = self.stdscr.getmaxyx()
+        term_size = size
         num_lines = 0
         for line in lines:
-            num_lines+= (len(line) / term_size[1]) + 1
+            if (len(line) % term_size[1] == 0) and len(line) != 0:
+                num_lines += len(line) / term_size[1]
+            else:
+                num_lines += (len(line) / term_size[1]) + 1
         return num_lines
 
     def write_to_log(self, string='', write_to_file=True):
@@ -161,7 +172,7 @@ class IOHandler:
         max_y, max_x = self.log_win.getmaxyx()
 
         self.log_win.scrollok(1)
-        lines = self.num_lines(string)
+        lines = self.num_lines(string, self.log_win.getmaxyx())
         self.log_win.setscrreg(0, max_y-2)
         self.log_win.scroll(lines)
         self.log_win.scrollok(0)
@@ -223,11 +234,12 @@ class IOHandler:
             self.write_to_input('>>> ')
             user_in = self.raw_input().strip()
             self.write_to_log('User input: ' + user_in)
-            for opt in self.current_menu.options:
-                if opt == user_in:
-                    self.write_to_log("Matched: " + str(opt) + '\n')
-                    self.dispatcher.dispatch(opt.event)
-                    return
+            opt = self.current_menu.match(user_in)
+            if opt != None:
+                self.write_to_log("Matched: " + str(opt) + '\n')
+                #TODO should the following line be moved to Menu?
+                self.dispatcher.dispatch(opt.event)
+                return
 
             self.write_to_log("INVALID INPUT\n")
 

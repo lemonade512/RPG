@@ -32,6 +32,12 @@ class Game:
         self.event_dispatcher.add_handler(
                 EventTypeEnum.MENU_ACTION_MOVE,
                 self.handle_action_menu_move)
+        self.event_dispatcher.add_handler(
+                EventTypeEnum.MENU_NEXT_PAGE,
+                self.handle_next_page)
+        self.event_dispatcher.add_handler(
+                EventTypeEnum.MENU_PREVOUS_PAGE,
+                self.handle_previous_page)
 
     def main(self):
         with self.io_handler:
@@ -55,6 +61,12 @@ class Game:
 
     def handle_action_menu_move(self, event):
         self.current_menu = MainMenu()
+
+    def handle_next_page(self, event):
+        self.current_menu.next_page()
+
+    def handle_previous_page(self, event):
+        self.current_menu.prev_page()
 
 if __name__ == "__main__":
     game = Game()
