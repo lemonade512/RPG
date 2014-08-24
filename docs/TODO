@@ -1,6 +1,5 @@
 # TODO Write an interactive test suite for IOHandler. These tests will require actual user input but should provide
 # directons to the user as to what they should type.
-# TODO Figure out how to have multi-page menus
 # TODO Create a basic action menu
 # TODO Create a location class (should areas hold locations or should locations be aware of areas?)
 # TODO For match options have each option contain a matched() function to implement more complex behaviour when an option is matched

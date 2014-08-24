@@ -102,14 +102,13 @@ class Page(object):
                     string += '\n'
                 else:
                     string += ' '*self.pad
-                #string += ' '*self.pad
-                fmt = '{:+<'+str(self.col_size*span)+'}'
-                #fmt = '{:<'+str(self.col_size*span)+'}'
+                #fmt = '{:+<'+str(self.col_size*span)+'}'
+                fmt = '{:<'+str(self.col_size*span)+'}'
                 string += fmt.format(str(opt))
             else:
                 curr_col += span
-                fmt = '{:=<'+str(self.col_size*span)+'}'
-                #fmt = '{:<'+str(self.col_size*span)+'}'
+                #fmt = '{:=<'+str(self.col_size*span)+'}'
+                fmt = '{:<'+str(self.col_size*span)+'}'
                 string += fmt.format(str(opt))
         return string
 
