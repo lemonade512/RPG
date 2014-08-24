@@ -9,8 +9,9 @@ class EventTypeEnum:
     GAME_START='game started'
     GAME_QUIT='game quit'
 
-    MENU_TEST='test menu events'
-    MENU_MAIN_PLAY='main menu play'
+    MENU_MAIN_NEW='main menu new'
+    MENU_MAIN_LOAD='main menu load'
+    MENU_MAIN_HELP='main menu help'
     MENU_ACTION_MOVE='action menu move'
     MENU_NEXT_PAGE='menu next page'
     MENU_PREVOUS_PAGE='menu previous page'

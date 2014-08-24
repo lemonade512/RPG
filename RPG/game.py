@@ -27,8 +27,8 @@ class Game:
 
     def register_for_events(self):
         self.event_dispatcher.add_handler(
-                EventTypeEnum.MENU_MAIN_PLAY,
-                self.handle_main_menu_play)
+                EventTypeEnum.MENU_MAIN_NEW,
+                self.handle_main_menu_new)
         self.event_dispatcher.add_handler(
                 EventTypeEnum.MENU_ACTION_MOVE,
                 self.handle_action_menu_move)
@@ -56,7 +56,7 @@ class Game:
                 self.io_handler.show_menu(menu)
                 self.io_handler.get_input()
 
-    def handle_main_menu_play(self, event):
+    def handle_main_menu_new(self, event):
         self.current_menu = ActionMenu()
 
     def handle_action_menu_move(self, event):
