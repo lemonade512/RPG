@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
-class Event:
+class Event(object):
 
-    def __init__(self, _type, data=None):
-        '''
-        _type should be taken from EventTypeEnum in event_dispatcher
-        data can be any data that needs to be passed. Best practice should dictate
-        that events that inherit from this base class should define more specific
-        data member variables.
-        '''
-        self.event_type = _type
+    def __init__(self, type_, data=None):
+        """ Initializes an event.
+
+        Args:
+            type_ (EventTypeEnum): The type of event this is.
+            data (optional): can be any data that needs to be passed. Best
+                practice should dictate that events that inherit from this
+                base class should define more specific data member variables.
+        """
+        self.event_type = type_
         self.data = data
